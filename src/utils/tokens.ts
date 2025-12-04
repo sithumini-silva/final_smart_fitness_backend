@@ -1,61 +1,24 @@
-// import { IUser } from "../models/User"
-// import jwt from "jsonwebtoken"
-// import dotenv from "dotenv"
-// dotenv.config()
-
-// const JWT_SECRET = process.env.JWT_SECRET as string
-// export const signAccessToken = (user: IUser): string => {
-//   return jwt.sign(
-//     {
-//       sub: user._id.toString(),
-//       roles: user.roles
-//     },
-//     JWT_SECRET,
-//     {
-//       expiresIn: "30m"
-//     }
-//   )
-// }
-
-// const JWT_REFRESH_SECRET = process.env.JWT_REFRESH_SECRET as string
-// export const signRefreshToken = (user: IUser): string => {
-//   return jwt.sign(
-//     {
-//       sub: user._id.toString()
-//     },
-//     JWT_REFRESH_SECRET,
-//     { expiresIn: "7d" }
-//   )
-// }
-
-// import { IUser } from "../models/User";
-// import jwt from "jsonwebtoken";
-// import dotenv from "dotenv";
-// dotenv.config();
-
-// const JWT_SECRET = process.env.JWT_SECRET as string;
-// const JWT_REFRESH_SECRET = process.env.JWT_REFRESH_SECRET as string;
-
-// export const signAccessToken = (user: IUser): string => {
-//   return jwt.sign({ sub: user._id.toString(), roles: user.roles }, JWT_SECRET, { expiresIn: "30m" });
-// };
-
-// export const signRefreshToken = (user: IUser): string => {
-//   return jwt.sign({ sub: user._id.toString() }, JWT_REFRESH_SECRET, { expiresIn: "7d" });
-// };
-
-import { IUser } from "../models/User";
 import jwt from "jsonwebtoken";
-import dotenv from "dotenv";
-dotenv.config();
+import { IUser } from "../models/User";
 
-const JWT_SECRET = process.env.JWT_SECRET as string;
-const JWT_REFRESH_SECRET = process.env.JWT_REFRESH_SECRET as string;
+// These will now load correctly because dotenv runs first in index.ts
+const ACCESS_TOKEN_SECRET = process.env.JWT_ACCESS_SECRET || "access_secret_123";
+const REFRESH_TOKEN_SECRET = process.env.JWT_REFRESH_SECRET || "refresh_secret_123";
+const ACCESS_TOKEN_EXPIRY = process.env.JWT_ACCESS_EXPIRES || "15m";
+const REFRESH_TOKEN_EXPIRY = process.env.JWT_REFRESH_EXPIRES || "7d";
 
-export const signAccessToken = (user: IUser): string => {
-  return jwt.sign({ sub: user._id.toString(), roles: user.roles }, JWT_SECRET, { expiresIn: "30m" });
+export const signAccessToken = (user: IUser) => {
+  return jwt.sign(
+      { sub: user._id, role: user.roles },
+      ACCESS_TOKEN_SECRET,
+      { expiresIn: ACCESS_TOKEN_EXPIRY } // Uses "15m" from .env
+  );
 };
 
-export const signRefreshToken = (user: IUser): string => {
-  return jwt.sign({ sub: user._id.toString() }, JWT_REFRESH_SECRET, { expiresIn: "7d" });
+export const signRefreshToken = (user: IUser) => {
+  return jwt.sign(
+      { sub: user._id },
+      REFRESH_TOKEN_SECRET,
+      { expiresIn: REFRESH_TOKEN_EXPIRY } // Uses "7d" from .env
+  );
 };

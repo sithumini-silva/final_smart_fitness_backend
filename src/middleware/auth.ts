@@ -1,88 +1,25 @@
-// // auth.ts
-// // auth.middlewares.ts
-// // authMiddlewares.ts
-// import { NextFunction, Request, Response } from "express"
-// import jwt from "jsonwebtoken"
-// import dotenv from "dotenv"
-// dotenv.config()
-
-// const JWT_SECRET = process.env.JWT_SECRET as string
-
-// export interface AuthRequest extends Request {
-//   user?: any
-// }
-
-// export const authenticate = (
-//   req: AuthRequest,
-//   res: Response,
-//   next: NextFunction
-// ) => {
-//   const authHeader = req.headers.authorization
-//   if (!authHeader) {
-//     return res.status(401).json({ message: "No token provided" })
-//   }
-//   //   Bearer fjhkuvjdjbknlmd
-//   const token = authHeader.split(" ")[1] // ["Bearer", "fjhkuvjdjbknlmd"]
-//   try {
-//     const payload = jwt.verify(token, JWT_SECRET)
-//     req.user = payload
-//     next()
-//   } catch (err) {
-//     res.status(401).json({ message: "Invalid or expire token" })
-//   }
-// }
-
-// import { NextFunction, Request, Response } from "express";
-// import jwt from "jsonwebtoken";
-// import dotenv from "dotenv";
-// dotenv.config();
-
-// const JWT_SECRET = process.env.JWT_SECRET as string;
-
-// export interface AuthRequest extends Request {
-//   user?: any;
-// }
-
-// export const authenticate = (req: AuthRequest, res: Response, next: NextFunction) => {
-//   const authHeader = req.headers.authorization;
-//   if (!authHeader) return res.status(401).json({ message: "No token provided" });
-
-//   const token = authHeader.split(" ")[1]; // Bearer <token>
-//   try {
-//     const payload = jwt.verify(token, JWT_SECRET);
-//     req.user = payload;
-//     next();
-//   } catch (err) {
-//     res.status(401).json({ message: "Invalid or expired token" });
-//   }
-// };
-
 import { Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
-import dotenv from "dotenv";
-dotenv.config();
 
-const JWT_SECRET = process.env.JWT_SECRET as string;
-
+// Extend Express Request interface to include user info
 export interface AuthRequest extends Request {
   user?: any;
 }
 
 export const authenticate = (req: AuthRequest, res: Response, next: NextFunction) => {
-  let token = req.headers.authorization?.split(" ")[1];
+  // 1. Check for token in Cookies (preferred) OR Authorization Header
+  const token = req.cookies.accessToken || req.headers.authorization?.split(" ")[1];
 
-  // fallback to cookie
-  if (!token && req.cookies?.accessToken) {
-    token = req.cookies.accessToken;
+  if (!token) {
+    return res.status(401).json({ message: "Unauthorized: No token provided" });
   }
 
-  if (!token) return res.status(401).json({ message: "No token provided" });
-
   try {
-    const payload = jwt.verify(token, JWT_SECRET);
-    req.user = payload;
+    const secret = process.env.JWT_ACCESS_SECRET || "access_secret_123";
+    const decoded = jwt.verify(token, secret);
+    req.user = decoded; // Attach user data (sub, roles) to request
     next();
-  } catch (err) {
-    res.status(401).json({ message: "Invalid or expired token" });
+  } catch (error) {
+    return res.status(403).json({ message: "Forbidden: Invalid or expired token" });
   }
 };
