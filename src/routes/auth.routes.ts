@@ -4,7 +4,8 @@ import {
     login,
     getMyDetails,
     handleRefreshToken,
-    registerAdmin // We imported this now, so it's safe to use
+    registerAdmin, // We imported this now, so it's safe to use
+    getUserMeasurements
 } from "../controllers/auth.controller";
 import { authenticate } from "../middleware/auth";
 
@@ -17,6 +18,7 @@ router.post("/refresh", handleRefreshToken);
 
 // Protected Routes
 router.get("/me", authenticate, getMyDetails);
+router.get("/measurements", authenticate, getUserMeasurements);
 
 // Admin Route (Optional - ensure you want this accessible)
 router.post("/admin/register", registerAdmin);

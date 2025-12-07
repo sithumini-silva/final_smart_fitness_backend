@@ -109,6 +109,28 @@ export const getMyDetails = async (req: AuthRequest, res: Response) => {
   res.status(200).json({ data: user });
 };
 
+// Get user measurements (height and weight)
+export const getUserMeasurements = async (req: AuthRequest, res: Response) => {
+  if (!req.user) return res.status(401).json({ message: "Unauthorized" });
+
+  try {
+    const user = await User.findById(req.user.sub).select("height weight");
+    if (!user) return res.status(404).json({ message: "User not found" });
+
+    res.status(200).json({
+      success: true,
+      data: {
+        height: user.height || 0,
+        weight: user.weight || 0,
+        heightUnit: 'cm',
+        weightUnit: 'kg'
+      }
+    });
+  } catch (error: any) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
 // --- 5. Refresh Token ---
 export const handleRefreshToken = async (req: Request, res: Response) => {
   try {
