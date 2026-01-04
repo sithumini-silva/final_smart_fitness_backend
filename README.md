@@ -5,10 +5,9 @@
 2. [Technologies & Tools](#🛠️-technologies--tools)  
 3. [Features](#✨-features)  
 4. [Installation & Setup](#⚙️-installation--setup)  
-5. [Environment Variables](#🔧-environment-variables)  
-6. [API Endpoints](#🌐-api-endpoints)  
-7. [Deployment](#🚀-deployment)  
-8. [Contributors](#👥-contributors)  
+5. [API Endpoints](#🌐-api-endpoints)  
+6. [Deployment](#🚀-deployment)  
+7. [Contributors](#👥-contributors)  
 
 ---
 
